@@ -2,6 +2,7 @@
 from numpy import * 
 from scipy import *
 from scipy.sparse import *
+from scipy.linalg import *
 
 def buildA(h,qcols,neq):
 
@@ -35,9 +36,11 @@ def buildA(h,qcols,neq):
     
     left  = range(0,qcols)
     right = range(qcols,qcols+neq)
-    hs = csr_matrix(h)
+    hs = lil_matrix(h)
     a0 = hs[:,right]
-    hs[:,left] = -hs[:,right].I * hs[:,left]
+    lu, piv = lu_factor(hs[:,right].toarray())
+    hs[:,left] = lu_solve((lu,piv),hs[:,left].toarray(),trans=0)
+    #hs[:,left] = -hs[:,right].I * hs[:,left]
     
     #  Build the big transition matrix.
     
@@ -46,10 +49,10 @@ def buildA(h,qcols,neq):
     if qcols > neq:
         eyerows = range(0,qcols-neq)
         eyecols = range(neq,qcols)
-        a[eyerows,eyecols] = eye(qcols-neq)
+        a[eyerows,:][:,eyecols] = numpy.eye(qcols-neq)
     
     hrows = range(qcols-neq,qcols)
-    a[hrows,:] = hs[:,left]
+    a[hrows,:] = hs[:,left].toarray()
 
     #  Delete inessential lags and build index array js.  js indexes the
     #  columns in the big transition matrix that correspond to the
@@ -59,18 +62,21 @@ def buildA(h,qcols,neq):
     js = range(0,qcols)
     zerocols = list()
     sumVector = abs(a).sum(axis=0)
-    for i in range(0,len(sumVector)):
-        if sumVector[i] == 0:
+    sumVectorRows, sumVectorCols = sumVector.shape
+    for i in range(0,sumVectorCols):
+        if sumVector[0,i] == 0:
             zerocols.append(i)
 
     while len(zerocols) > 0:
         a = delete(a,zerocols,1)
         a = delete(a,zerocols,0)
         js = delete(js,zerocols)
-        zerocols = list()
-        sumVector = abs(a).sum(axis=0)
-        for i in range(0,len(sumVector)):
-            if sumVector[i] == 0:
+        while len(zerocols) > 0:
+            zerocols.pop()
+        sumVector2 = abs(a).sum(axis=0)
+        sumVector2Rows, sumVector2Cols = sumVector2.shape
+        for i in range(0,sumVector2Cols):
+            if sumVector2[0,i] == 0:
                 zerocols.append(i)
 
     ia = len(js)
