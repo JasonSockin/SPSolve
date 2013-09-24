@@ -41,11 +41,11 @@ def Shiftright(x,n):
     #  first n columns. 
     
     rows, cols = x.shape
-    left  = range(0,cols-n)  
-    right = range(n,cols) 
+    left  = list(range(0,cols-n))
+    right = list(range(n,cols))
     
     y = matrix(zeros(shape=((rows,cols))))
-    y[ix_(range(0,rows),right)] = x[range(0,rows),:][:,left].toarray()
+    y[ix_(list(range(0,rows)),right)] = x[list(range(0,rows)),:][:,left].toarray()
     
     return y
 
@@ -53,34 +53,36 @@ def Shiftright(x,n):
 
 
 def exactShift(h,q,iq,qrows,qcols,neq):
-
+    
     # Compute the exact shiftrights and store them in q.
 
     hs = lil_matrix(h)
-    
     nexact = 0
-    left   = range(0,qcols)
-    right  = range(qcols,qcols+neq)
+    left = list(range(0,qcols))
+    right = list(range(qcols,qcols+neq))
     zerorows = list()
-    sumVector = abs(hs[:,right].T).sum(axis=1)
-    for i in range(0,len(sumVector)):
-        if sumVector[i] == 0:
+    sumVector = abs(hs[:,right]).sum(axis=1)
+    sumVectorRows, sumVectorCols = sumVector.shape
+    for i in range(0,sumVectorRows):
+        if sumVector[i,0] == 0:
             zerorows.append(i)
 
     while len(zerorows) > 0  and iq <= qrows:
         nz = len(zerorows)
         hsRows, hsCols = hs.get_shape()
-        q[ix_(range(iq,iq+nz),range(0,qcols))] = hs[zerorows,:][:,left].toarray()
+        q[ix_(list(range(iq,iq+nz)),list(range(0,qcols)))] = hs[zerorows,:][:,left].toarray()
         hs[zerorows,:] = Shiftright( hs[zerorows,:], neq )
         iq = iq + nz
         nexact = nexact + nz
-        zerorows = list()
-        newSumVector = abs(hs[:,right].T).sum(axis=1)
-        for i in range(0,len(newSumVector)):
-            if newSumVector[i] == 0:
+        while len(zerorows) > 0:
+            zerorows.pop()
+        newSumVector = abs(hs[:,right]).sum(axis=1)
+        newSumVectorRows, newSumVectorCols = newSumVector.shape
+        for i in range(0,newSumVectorRows):
+            if newSumVector[i,0] == 0:
                 zerorows.append(i)
-        h = lil_matrix(hs).todense()
 
+    h = lil_matrix(hs).todense()
     return h, q, iq, nexact
 
 #########################################################################
@@ -90,10 +92,9 @@ def numericShift(h,q,iq,qrows,qcols,neq,condn):
     # Compute the numeric shiftrights and store them in q.
     
     nnumeric = 0
-    left     = range(0,qcols)
-    right    = range(qcols,qcols+neq)
-    
-    Q, R  = qr(h[:,right])
+    left = list(range(0,qcols))
+    right = list(range(qcols,qcols+neq))
+    Q, R, P  = qr(h[:,right], pivoting = True)
     zerorows = list()
     testVector = abs(diagonal(R))
     for i in range(0,len(testVector)):

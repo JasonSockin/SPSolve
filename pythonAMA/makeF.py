@@ -31,7 +31,7 @@ def makeF(phi,cof,q,nlag,nlead,neq):
 
     for i in range(0,neq*(nlead-1)):
         # Establish the horizontal index for inserting 1s into F
-        j = i + neq -1
+        j = i + neq
         # Insert Identity values into F
         F[i,j] = 1
         
@@ -62,7 +62,7 @@ def makeF(phi,cof,q,nlag,nlead,neq):
                     newB_R[alpha+neq,beta] = newB_R[alpha,beta]
                 
             # Then, insert 0's into the newly emptied cells.
-            newB_R[0:neq,0:neq] = matrix(zeros(shape=((neq,neg))))
+            newB_R[0:neq,0:neq] = matrix(zeros(shape=((neq,neq))))
                 
     return F
 

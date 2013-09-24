@@ -3,9 +3,12 @@
 # Created by: Jason Sockin
 # Date: September 11, 2013
 
+# import numpy package
+from numpy import *
+
 # Checks for any NaN in a
 def existsNaN(a):
-    aTemp = numpy.isnan(a)
+    aTemp = isnan(a)
     aRows, aColumns = aTemp.shape
     result = False
     for i in range(0,aRows):
@@ -20,7 +23,7 @@ def existsNaN(a):
 
 # Checks for any Inf in a
 def existsInf(a):
-    aTemp = numpy.isinf(a)
+    aTemp = isinf(a)
     aRows, aColumns = aTemp.shape
     result = False
     for i in range(0,aRows):

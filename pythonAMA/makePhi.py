@@ -15,8 +15,8 @@ def makePhi(q,cof,nlag,nlead,neq):
     H_0 = cof[:,neq*nlag:neq*(nlag+1)]
 
     # Calculate the H_+ Matrix, which is nlead*neq x neq
-    H_plus = cof[:,neq*(nlag+1)-1:neq*(nlag+nlead+1)]
-    
+    H_plus = cof[:,neq*(nlag+1):neq*(nlag+nlead+1)]
+
     # Calculate the Q_L Matrix, which is neq*nlead x neq*nlag
     Q_L = q[:,0:neq*nlag]
 

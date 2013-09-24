@@ -37,10 +37,10 @@ def Eigensystem(a,uprbnd,rowsLeft):
 
     rts, w = eig(a.T)
     mag = sorted(-abs(rts))
-    k = range(0,len(mag))
-    rts = sorted(rts, reverse = True)
-    
-    ws = csr_matrix(w)
+    k = argsort(-abs(rts))
+    rts = rts[k]
+
+    ws = lil_matrix(w)
     ws = ws[:,k]
     
     #  Given a complex conjugate pair of vectors W = [w1,w2], there is a
@@ -50,8 +50,8 @@ def Eigensystem(a,uprbnd,rowsLeft):
     
     ws = ws.real + ws.imag
     
-    lgroots = sum(abs(rts) > uprbnd)
+    lgroots = sum(abs(asarray(rts)) > uprbnd)
     
-    w = csr_matrix(ws).todense()
+    w = lil_matrix(ws).todense()
     
     return w, rts, lgroots

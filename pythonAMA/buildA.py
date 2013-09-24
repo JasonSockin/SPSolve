@@ -34,13 +34,12 @@ def buildA(h,qcols,neq):
     # pages 472-489
     
     
-    left  = range(0,qcols)
-    right = range(qcols,qcols+neq)
+    left  = list(range(0,qcols))
+    right = list(range(qcols,qcols+neq))
     hs = lil_matrix(h)
     a0 = hs[:,right]
     lu, piv = lu_factor(hs[:,right].toarray())
-    hs[:,left] = lu_solve((lu,piv),hs[:,left].toarray(),trans=0)
-    #hs[:,left] = -hs[:,right].I * hs[:,left]
+    hs[:,left] = -lu_solve((lu,piv),hs[:,left].toarray(),trans=0)
     
     #  Build the big transition matrix.
     
@@ -49,9 +48,9 @@ def buildA(h,qcols,neq):
     if qcols > neq:
         eyerows = range(0,qcols-neq)
         eyecols = range(neq,qcols)
-        a[eyerows,:][:,eyecols] = numpy.eye(qcols-neq)
+        a[ix_(eyerows,eyecols)] = eye(qcols-neq).todense()
     
-    hrows = range(qcols-neq,qcols)
+    hrows = list(range(qcols-neq,qcols))
     a[hrows,:] = hs[:,left].toarray()
 
     #  Delete inessential lags and build index array js.  js indexes the
@@ -59,7 +58,7 @@ def buildA(h,qcols,neq):
     #  essential lags in the model.  They are the columns of q that will
     #  get the unstable left eigenvectors. 
     
-    js = range(0,qcols)
+    js = list(range(0,qcols))
     zerocols = list()
     sumVector = abs(a).sum(axis=0)
     sumVectorRows, sumVectorCols = sumVector.shape
@@ -80,5 +79,4 @@ def buildA(h,qcols,neq):
                 zerocols.append(i)
 
     ia = len(js)
-
     return a, ia, js

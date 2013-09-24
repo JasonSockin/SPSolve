@@ -90,7 +90,7 @@ def Amalg(h,neq,nlag,nlead,condn,uprbnd):
     if iq > qrows: 
         aimcode = 61
         return
-
+    
     h, q, iq, nnumeric = numericShift(h,q,iq,qrows,qcols,neq,condn)
     if iq > qrows: 
         aimcode = 62
@@ -103,11 +103,11 @@ def Amalg(h,neq,nlag,nlead,condn,uprbnd):
 
     if ia != 0:
         if existsNaN(a) or existsInf(a) : 
-            print "A is NAN or INF"
+            print("A is NAN or INF")
             aimcode=63 
             return 
-        w, rts, lgroots = Eigensystem(a,uprbnd,min(length(js),qrows-iq+1))
-        q = Copy_w(q,w,js,iq,qrows)
+        w, rts, lgroots = Eigensystem(a,uprbnd,min(len(js),qrows-iq+1))
+        q = copyW(q,w,js,iq,qrows)
 
     test = nexact + nnumeric + lgroots
     if test > qrows:
@@ -116,9 +116,17 @@ def Amalg(h,neq,nlag,nlead,condn,uprbnd):
         aimcode = 4
 
     phi = makePhi(q,originalH,nlag,nlead,neq)
-    print phi
-    F = makeF(phi,originalH,nlag,nlead,neq)
-    print F
+    F = makeF(phi,originalH,q,nlag,nlead,neq)
+    print()
+    print("phi =")
+    print()
+    print(phi)
+    print()
+    print()
+    print("F = ")
+    print()
+    print(F)
+    print()
 
     # If the right-hand block of q is invertible, compute the reduced form.
 

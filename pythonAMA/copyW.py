@@ -1,3 +1,6 @@
+# import numpy package
+from numpy import *
+
 def copyW(q,w,js,iq,qrows):
 
     #  Copy the eigenvectors corresponding to the largest roots into the
@@ -29,8 +32,8 @@ def copyW(q,w,js,iq,qrows):
     
     
     if iq < qrows:
-        lastrows = range(iq,qrows+1)
-        wrows = range(0,len(lastrows))
-        q[lastrows-1,js-1] = w[:,wrows-1].T
+        lastrows = list(range(iq,qrows))
+        wrows = list(range(0,len(lastrows)))
+        q[ix_(lastrows,js)] = w[:,wrows].T
 
     return q
